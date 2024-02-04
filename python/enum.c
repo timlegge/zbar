@@ -50,8 +50,16 @@ static zbarEnumItem *enumitem_new(PyTypeObject *type, PyObject *args,
 
     /* we assume the "fast path" for a single-digit ints (see longobject.c) */
     /* this also holds if we get a small_int preallocated long */
+#if PY_VERSION_HEX >= 0x030900A4
+    Py_SET_SIZE(&self->val, Py_SIZE(longval));
+#else
     Py_SIZE(&self->val)	  = Py_SIZE(longval);
+#endif
+#if PY_VERSION_HEX >= 0x030c0000
+    self->val.long_value.ob_digit[0] = longval->long_value.ob_digit[0];
+#else
     self->val.ob_digit[0] = longval->ob_digit[0];
+#endif
     Py_DECREF(longval);
 #else
     self->val.ob_ival = val;
@@ -129,8 +137,16 @@ zbarEnumItem *zbarEnumItem_New(PyObject *byname, PyObject *byvalue, int val,
 
     /* we assume the "fast path" for a single-digit ints (see longobject.c) */
     /* this also holds if we get a small_int preallocated long */
+#if PY_VERSION_HEX >= 0x030900A4
+    Py_SET_SIZE(&self->val, Py_SIZE(longval));
+#else
     Py_SIZE(&self->val)	  = Py_SIZE(longval);
+#endif
+#if PY_VERSION_HEX >= 0x030c0000
+    self->val.long_value.ob_digit[0] = longval->long_value.ob_digit[0];
+#else
     self->val.ob_digit[0] = longval->ob_digit[0];
+#endif
     Py_DECREF(longval);
 
     self->name = PyUnicode_FromString(name);
